@@ -10,11 +10,12 @@ const main = async () => {
         const clientId = clientSecretStore.ClientId;
         const clientSecret = clientSecretStore.ClientSecret;
 
+        // not following the RFC7523 spec, but this is just for the POC
         const jwt = await new jose.SignJWT({ id: 'KID_12345' })
             .setProtectedHeader({ alg })
             .setIssuedAt()
             .setIssuer(clientId)
-            .setSubject(clientSecret)
+            .setSubject(clientSecret) // this is just for the POC, but the secret will be encrypted and retrieved in production on the GC Forms side
             .setExpirationTime("1h")
             .sign(privateKey);
 

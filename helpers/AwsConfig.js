@@ -45,11 +45,13 @@ async function createAppClient() {
 async function getAccessToken(token, clientId) {
     const jwt = require('jsonwebtoken');
 
-    console.log("TODO retrieve public key for client id: ", clientId);
+    console.log("TODO retrieve public key and secret for client id: ", clientId);
     const cert = fs.readFileSync("./client_public_key.pem", { encoding: "utf8" });
     const user = jwt.verify(token, cert);
+    if (user.iss !== clientId) return { statusCode: 401, response: "Unauthorized" };
+    const clientSecret = user.sub;
 
-    return internal_getAccessToken(user.iss, user.sub);
+    return internal_getAccessToken(clientId, clientSecret);
 }
 
 async function internal_getAccessToken(clientId, clientSecret) {
