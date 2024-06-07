@@ -1,4 +1,3 @@
-const AWS = require('aws-sdk');
 const { CognitoIdentityProviderClient, CreateUserPoolClientCommand } = require("@aws-sdk/client-cognito-identity-provider");
 const { v4: uuidv4 } = require('uuid');
 const { Issuer } = require('openid-client');

@@ -8,6 +8,8 @@ const main = async () => {
         const alg = "RS256";
         const privateKey = crypto.createPrivateKey({ key: clientSecretStore.privateKey });
         const clientId = clientSecretStore.ClientId;
+
+        // this is just for the POC - normally the client secret would be stored securely and encrypted. TBD if it is on the client side or Forms side
         const clientSecret = clientSecretStore.ClientSecret;
 
         // not following the RFC7523 spec, but this is just for the POC
@@ -15,7 +17,7 @@ const main = async () => {
             .setProtectedHeader({ alg })
             .setIssuedAt()
             .setIssuer(clientId)
-            .setSubject(clientSecret) // this is just for the POC, but the secret will be encrypted and retrieved in production on the GC Forms side
+            .setSubject(clientSecret) // this is just for the POC
             .setExpirationTime("1h")
             .sign(privateKey);
 
