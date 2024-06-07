@@ -2,7 +2,6 @@ const clientSecretStore = require('./client_secret_store.json');
 const crypto = require('crypto');
 const jose = require('jose');
 const axios = require('axios');
-const { param } = require('./routes/AuthRoutes');
 
 const main = async () => {
     try {

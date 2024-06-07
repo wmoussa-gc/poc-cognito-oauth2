@@ -3,7 +3,7 @@ const { CognitoIdentityProviderClient, CreateUserPoolClientCommand } = require("
 const { v4: uuidv4 } = require('uuid');
 const { Issuer } = require('openid-client');
 const { CognitoJwtVerifier } = require('aws-jwt-verify');
-const clientSecretStore = require('../client_secret_store.json');
+const fs = require('node:fs');
 
 async function createAppClient() {
     const client = new CognitoIdentityProviderClient({
@@ -23,6 +23,22 @@ async function createAppClient() {
     const { UserPoolClient } = await client.send(createUserPoolClientCommand);
     const { ClientId, ClientSecret } = UserPoolClient;
     const { privateKey, publicKey } = generateKeyPair();
+    fs.writeFile('client_public_key.pem', publicKey, err => {
+        if (err) {
+            console.error(err);
+        } else {
+            // file written successfully
+        }
+    });
+
+    fs.writeFile('client_secret_store.json', JSON.stringify({ ClientId, ClientSecret, privateKey }), err => {
+        if (err) {
+            console.error(err);
+        } else {
+            // file written successfully
+        }
+    });
+
     return { ClientId, ClientSecret, privateKey, publicKey };
 }
 
@@ -30,14 +46,14 @@ async function getAccessToken(token, clientId) {
     const jwt = require('jsonwebtoken');
 
     console.log("TODO retrieve public key for client id: ", clientId);
-    const cert = clientSecretStore.publicKey;
+    const cert = fs.readFileSync("./client_public_key.pem", { encoding: "utf8" });
     const user = jwt.verify(token, cert);
 
     return internal_getAccessToken(user.iss, user.sub);
 }
 
 async function internal_getAccessToken(clientId, clientSecret) {
-    const issuer = new Issuer({ "token_endpoint": "https://formsm2m.auth.ca-central-1.amazoncognito.com/oauth2/token" });
+    const issuer = new Issuer({ "token_endpoint": process.env.AWS_COGNITO_DOMAIN + "/oauth2/token" });
 
     const client = new issuer.Client({
         client_id: clientId,
